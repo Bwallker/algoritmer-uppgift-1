@@ -1,0 +1,23 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Ex1",
+      "request": "launch",
+      "mainClass": "Ex1",
+      "projectName": "algoritmer-uppgift-1_1c9e91bc"
+    },
+    {
+      "name": "Custom launch",
+      "processCreateCommands": [
+        "settings set target.run-args value1 value2 value3",
+        "process launch"
+      ],
+      "request": "custom",
+      "targetCreateCommands": [
+        "target create ${workspaceFolder}/<your program>"
+      ],
+      "type": "lldb"
+    }
+  ]
+}
