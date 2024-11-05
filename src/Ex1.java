@@ -7,6 +7,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Ex1 {
@@ -51,6 +52,9 @@ class MazeComponent extends JComponent {
 	protected int cells;
 	protected int cellWidth;
 	protected int cellHeight;
+
+	protected UnionFind uf;
+
 	Random random;
 
 	// Draw a maze of size w*h with c*c cells
@@ -61,6 +65,8 @@ class MazeComponent extends JComponent {
 		cellHeight = h / cells; // Height of a cell
 		width = c * cellWidth; // Calculate exact dimensions of the component
 		height = c * cellHeight;
+		uf = new UnionFind(cells * cells);
+		random = new Random();
 		setPreferredSize(new Dimension(width + 1, height + 1)); // Add 1 pixel for the border
 	}
 
@@ -87,14 +93,92 @@ class MazeComponent extends JComponent {
 		createMaze(cells, g);
 	}
 
+	private boolean wallIsInvalid(int x, int y, int wall) {
+		switch (wall) {
+			// Left wall, can't be on the left edge.
+			case 0:
+				return x == 0;
+			// Upper wall, can't be on the top edge.
+			case 1:
+				return y == 0;
+			// Right wall, can't be on the right edge.
+			case 2:
+				return x == cells - 1;
+			// Lower wall, can't be on the bottom edge.
+			case 3:
+				return y == cells - 1;
+			default:
+				return true;
+		}
+	}
+
+	// Checks if two cells are neighbors
+	private boolean areNeighbors(int index1, int index2) {
+		int x1 = index1 % cells;
+		int y1 = index1 / cells;
+		int x2 = index2 % cells;
+		int y2 = index2 / cells;
+		if (Math.abs(x1 - x2) == 1) {
+			return y1 == y2;
+		}
+		if (Math.abs(y1 - y2) == 1) {
+			return x1 == x2;
+		}
+		return false;
+	}
+
+	// Returns the wall that connects two cells, from the perspective of the first
+	// cell.
+	private int getConnectingWall(int index1, int index2) {
+		int x1 = index1 % cells;
+		int y1 = index1 / cells;
+		int x2 = index2 % cells;
+		int y2 = index2 / cells;
+		if (x1 == x2) {
+			if (y1 < y2) {
+				// The first cell is above the second cell, so the wall is the bottom wall of
+				// the first cell.
+				return 3;
+			} else {
+				// The first cell is below the second cell, so the wall is the top wall of the
+				// first cell.
+				return 1;
+			}
+		} else {
+			if (x1 < x2) {
+				// The first cell is to the left of the second cell, so the wall is the right
+				// wall of the first cell.
+				return 2;
+			} else {
+				// The first cell is to the right of the second cell, so the wall is the left
+				// wall of the first cell.
+				return 0;
+			}
+		}
+	}
+
 	private void createMaze(int cells, Graphics g) {
-		System.out.println("Creating maze of size " + cells + " by " + cells);
 		// Get the current color of the graphics object so we can restore it later.
 		Color c = g.getColor();
 		// Set the color to our background color so we can remove walls by painting over
 		// them with the background color.
 		g.setColor(getBackground());
-
+		drawWall(10, 10, 3, g);
+		while (!uf.isUniform()) {
+			int index1 = random.nextInt(cells * cells);
+			int index2 = random.nextInt(cells * cells);
+			if (!areNeighbors(index1, index2) || uf.find(index1) == uf.find(index2)) {
+				continue;
+			}
+			int wall = getConnectingWall(index1, index2);
+			int x1 = index1 % cells;
+			int y1 = index1 / cells;
+			int x2 = index2 % cells;
+			int y2 = index2 / cells;
+			System.out.println("x1: " + x1 + " y1: " + y1 + " x2: " + x2 + " y2: " + y2 + " wall: " + wall);
+			drawWall(x1, y1, wall, g);
+			uf.union(index1, index2);
+		}
 		// Undo the color change.
 		g.setColor(c);
 	}
@@ -139,14 +223,25 @@ final class UnionFind {
 		}
 	}
 
-	public int find(int x) {
+	private int find_impl(int x) {
 		if (nodes[x] < 0)
 			return x;
 		else
 			return nodes[x] = find(nodes[x]);
 	}
 
+	public int find(int x) {
+		if (x < 0 || x >= nodes.length) {
+			throw new IllegalArgumentException("Index out of bounds");
+		}
+		return find_impl(x);
+	}
+
+	// Unions the sets that contain x and y.
 	public void union(int x, int y) {
+		if (x < 0 || x >= nodes.length || y < 0 || y >= nodes.length) {
+			throw new IllegalArgumentException("Index out of bounds");
+		}
 		x = find(x);
 		y = find(y);
 		if (nodes[y] < nodes[x]) {
@@ -156,5 +251,27 @@ final class UnionFind {
 			nodes[x] += nodes[y];
 			nodes[y] = x;
 		}
+	}
+
+	// Counts how many roots there are in the UnionFind and returns the count.
+	public int numRoots() {
+		int count = 0;
+		for (int i = 0; i < nodes.length; i++) {
+			if (nodes[i] < 0) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	// Returns true if the UnionFind is uniform, meaning that there is only one
+	// root.
+	public boolean isUniform() {
+		return numRoots() == 1;
+	}
+
+	@Override
+	public String toString() {
+		return Arrays.toString(nodes);
 	}
 }
