@@ -88,9 +88,15 @@ class MazeComponent extends JComponent {
 	}
 
 	private void createMaze(int cells, Graphics g) {
+		System.out.println("Creating maze of size " + cells + " by " + cells);
+		// Get the current color of the graphics object so we can restore it later.
+		Color c = g.getColor();
+		// Set the color to our background color so we can remove walls by painting over
+		// them with the background color.
+		g.setColor(getBackground());
 
-		// This is what you write
-
+		// Undo the color change.
+		g.setColor(c);
 	}
 
 	// Paints the interior of the cell at postion x,y with colour c
@@ -119,6 +125,36 @@ class MazeComponent extends JComponent {
 			case (3): // Wall at bottom
 				g.drawLine(xpos + 1, ypos + cellHeight, xpos + cellWidth - 1, ypos + cellHeight);
 				break;
+		}
+	}
+}
+
+final class UnionFind {
+	private int[] nodes;
+
+	public UnionFind(int n) {
+		nodes = new int[n];
+		for (int i = 0; i < n; i++) {
+			nodes[i] = -1;
+		}
+	}
+
+	public int find(int x) {
+		if (nodes[x] < 0)
+			return x;
+		else
+			return nodes[x] = find(nodes[x]);
+	}
+
+	public void union(int x, int y) {
+		x = find(x);
+		y = find(y);
+		if (nodes[y] < nodes[x]) {
+			nodes[y] += nodes[x];
+			nodes[x] = y;
+		} else {
+			nodes[x] += nodes[y];
+			nodes[y] = x;
 		}
 	}
 }
