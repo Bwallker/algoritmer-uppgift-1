@@ -52,7 +52,7 @@ class MazeComponent extends JComponent {
 	protected int cells;
 	protected int cellWidth;
 	protected int cellHeight;
-
+	protected boolean isFirstTime = true;
 	protected UnionFind uf;
 
 	Random random;
@@ -112,75 +112,43 @@ class MazeComponent extends JComponent {
 		}
 	}
 
-	// Checks if two cells are neighbors
-	private boolean areNeighbors(int index1, int index2) {
-		int x1 = index1 % cells;
-		int y1 = index1 / cells;
-		int x2 = index2 % cells;
-		int y2 = index2 / cells;
-		if (Math.abs(x1 - x2) == 1) {
-			return y1 == y2;
-		}
-		if (Math.abs(y1 - y2) == 1) {
-			return x1 == x2;
-		}
-		return false;
-	}
-
-	// Returns the wall that connects two cells, from the perspective of the first
-	// cell.
-	private int getConnectingWall(int index1, int index2) {
-		int x1 = index1 % cells;
-		int y1 = index1 / cells;
-		int x2 = index2 % cells;
-		int y2 = index2 / cells;
-		if (x1 == x2) {
-			if (y1 < y2) {
-				// The first cell is above the second cell, so the wall is the bottom wall of
-				// the first cell.
-				return 3;
-			} else {
-				// The first cell is below the second cell, so the wall is the top wall of the
-				// first cell.
-				return 1;
-			}
-		} else {
-			if (x1 < x2) {
-				// The first cell is to the left of the second cell, so the wall is the right
-				// wall of the first cell.
-				return 2;
-			} else {
-				// The first cell is to the right of the second cell, so the wall is the left
-				// wall of the first cell.
-				return 0;
-			}
+	private int calculateIndex(int index, int wall) {
+		switch (wall) {
+			case 0:
+				return index - 1;
+			case 1:
+				return index - cells;
+			case 2:
+				return index + 1;
+			case 3:
+				return index + cells;
+			default:
+				throw new IllegalArgumentException("Invalid wall: " + wall);
 		}
 	}
 
 	private void createMaze(int cells, Graphics g) {
 		// Get the current color of the graphics object so we can restore it later.
-		Color c = g.getColor();
+		// Color c = g.getColor();
 		// Set the color to our background color so we can remove walls by painting over
 		// them with the background color.
-		g.setColor(getBackground());
-		drawWall(10, 10, 3, g);
+		g.setColor(Color.yellow);
 		while (!uf.isUniform()) {
-			int index1 = random.nextInt(cells * cells);
-			int index2 = random.nextInt(cells * cells);
-			if (!areNeighbors(index1, index2) || uf.find(index1) == uf.find(index2)) {
+			int index = random.nextInt(cells * cells);
+			int wall = random.nextInt(4);
+			if (wallIsInvalid(index % cells, index / cells, wall)) {
+				wall = (wall + 2) % 4;
+			}
+			int index2 = calculateIndex(index, wall);
+			if (uf.find(index) == uf.find(index2)) {
 				continue;
 			}
-			int wall = getConnectingWall(index1, index2);
-			int x1 = index1 % cells;
-			int y1 = index1 / cells;
-			int x2 = index2 % cells;
-			int y2 = index2 / cells;
-			System.out.println("x1: " + x1 + " y1: " + y1 + " x2: " + x2 + " y2: " + y2 + " wall: " + wall);
-			drawWall(x1, y1, wall, g);
-			uf.union(index1, index2);
+			drawWall(index % cells, index / cells, wall, g);
+			uf.union(index, index2);
 		}
+
 		// Undo the color change.
-		g.setColor(c);
+		// g.setColor(c);
 	}
 
 	// Paints the interior of the cell at postion x,y with colour c
