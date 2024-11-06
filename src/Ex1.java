@@ -129,7 +129,7 @@ class MazeComponent extends JComponent {
 
 	private void createMaze(int cells, Graphics g) {
 		// Get the current color of the graphics object so we can restore it later.
-		// Color c = g.getColor();
+		Color c = g.getColor();
 		// Set the color to our background color so we can remove walls by painting over
 		// them with the background color.
 		g.setColor(Color.yellow);
@@ -148,7 +148,7 @@ class MazeComponent extends JComponent {
 		}
 
 		// Undo the color change.
-		// g.setColor(c);
+		g.setColor(c);
 	}
 
 	// Paints the interior of the cell at postion x,y with colour c
