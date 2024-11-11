@@ -46,16 +46,14 @@ public class Ex1 {
 	}
 }
 
-class MazeComponent extends JComponent {
-	protected int width;
-	protected int height;
-	protected int cells;
-	protected int cellWidth;
-	protected int cellHeight;
-	protected boolean isFirstTime = true;
-	protected UnionFind uf;
-
-	Random random;
+final class MazeComponent extends JComponent {
+	private final int width;
+	private final int height;
+	private final int cells;
+	private final int cellWidth;
+	private final int cellHeight;
+	private final UnionFind uf;
+	private final Random random;
 
 	// Draw a maze of size w*h with c*c cells
 	MazeComponent(int w, int h, int c) {
@@ -70,10 +68,15 @@ class MazeComponent extends JComponent {
 		setPreferredSize(new Dimension(width + 1, height + 1)); // Add 1 pixel for the border
 	}
 
+	@Override
+	public boolean isOpaque() {
+		return true;
+	}
+
+	@Override
 	public void paintComponent(Graphics g) {
 		g.setColor(Color.yellow); // Yellow background
 		g.fillRect(0, 0, width, height);
-
 		// Draw a grid of cells
 		g.setColor(Color.blue); // Blue lines
 		for (int i = 0; i <= cells; i++) { // Draw horizontal grid lines
@@ -108,7 +111,7 @@ class MazeComponent extends JComponent {
 			case 3:
 				return y == cells - 1;
 			default:
-				return true;
+				throw new IllegalArgumentException("Invalid wall: " + wall);
 		}
 	}
 
