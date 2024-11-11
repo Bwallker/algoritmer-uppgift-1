@@ -129,7 +129,7 @@ final class MazeComponent extends JComponent {
 		g.setColor(Color.yellow);
 		// UnionFind cannot be a class member because it needs to be reinitialized every
 		// time renderComponent is called in order for our component to be
-		// deterministic.
+		// pure.
 		UnionFind uf = new UnionFind(cells * cells);
 		Random random = new Random();
 
