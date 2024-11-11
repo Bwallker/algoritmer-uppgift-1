@@ -55,6 +55,8 @@ final class MazeComponent extends JComponent {
 	private final UnionFind uf;
 	private final Random random;
 
+	private boolean isFirstTime = true;
+
 	// Draw a maze of size w*h with c*c cells
 	MazeComponent(int w, int h, int c) {
 		super();
@@ -75,6 +77,10 @@ final class MazeComponent extends JComponent {
 
 	@Override
 	public void paintComponent(Graphics g) {
+		if (isFirstTime) {
+			isFirstTime = false;
+			return;
+		}
 		g.setColor(Color.yellow); // Yellow background
 		g.fillRect(0, 0, width, height);
 		// Draw a grid of cells
