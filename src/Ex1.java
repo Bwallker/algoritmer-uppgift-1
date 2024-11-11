@@ -52,10 +52,8 @@ final class MazeComponent extends JComponent {
 	private final int cells;
 	private final int cellWidth;
 	private final int cellHeight;
-	private final UnionFind uf;
+	private UnionFind uf;
 	private final Random random;
-
-	private boolean isFirstTime = true;
 
 	// Draw a maze of size w*h with c*c cells
 	MazeComponent(int w, int h, int c) {
@@ -65,17 +63,12 @@ final class MazeComponent extends JComponent {
 		cellHeight = h / cells; // Height of a cell
 		width = c * cellWidth; // Calculate exact dimensions of the component
 		height = c * cellHeight;
-		uf = new UnionFind(cells * cells);
 		random = new Random();
 		setPreferredSize(new Dimension(width + 1, height + 1)); // Add 1 pixel for the border
 	}
 
 	@Override
 	public void paintComponent(Graphics g) {
-		if (isFirstTime) {
-			isFirstTime = false;
-			return;
-		}
 		g.setColor(Color.yellow); // Yellow background
 		g.fillRect(0, 0, width, height);
 		// Draw a grid of cells
@@ -137,6 +130,7 @@ final class MazeComponent extends JComponent {
 		// Set the color to our background color so we can remove walls by painting over
 		// them with the background color.
 		g.setColor(Color.yellow);
+		uf = new UnionFind(cells * cells);
 		while (!uf.isUniform()) {
 			int index = random.nextInt(cells * cells);
 			int wall = random.nextInt(4);
