@@ -52,7 +52,6 @@ final class MazeComponent extends JComponent {
 	private final int cells;
 	private final int cellWidth;
 	private final int cellHeight;
-	private UnionFind uf;
 	private final Random random;
 
 	// Draw a maze of size w*h with c*c cells
@@ -130,7 +129,7 @@ final class MazeComponent extends JComponent {
 		// Set the color to our background color so we can remove walls by painting over
 		// them with the background color.
 		g.setColor(Color.yellow);
-		uf = new UnionFind(cells * cells);
+		UnionFind uf = new UnionFind(cells * cells);
 		while (!uf.isUniform()) {
 			int index = random.nextInt(cells * cells);
 			int wall = random.nextInt(4);
