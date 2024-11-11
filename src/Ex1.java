@@ -71,11 +71,6 @@ final class MazeComponent extends JComponent {
 	}
 
 	@Override
-	public boolean isOpaque() {
-		return true;
-	}
-
-	@Override
 	public void paintComponent(Graphics g) {
 		if (isFirstTime) {
 			isFirstTime = false;
