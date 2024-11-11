@@ -183,8 +183,10 @@ final class MazeComponent extends JComponent {
 
 final class UnionFind {
 	private int[] nodes;
+	private int numRoots;
 
 	public UnionFind(int n) {
+		numRoots = n;
 		nodes = new int[n];
 		for (int i = 0; i < n; i++) {
 			nodes[i] = -1;
@@ -212,6 +214,9 @@ final class UnionFind {
 		}
 		x = find(x);
 		y = find(y);
+		if (x == y) {
+			return;
+		}
 		if (nodes[y] < nodes[x]) {
 			nodes[y] += nodes[x];
 			nodes[x] = y;
@@ -219,17 +224,14 @@ final class UnionFind {
 			nodes[x] += nodes[y];
 			nodes[y] = x;
 		}
+		// Every time we union two sets, the number of roots decreases by one since
+		// we've merged two sets.
+		numRoots--;
 	}
 
 	// Counts how many roots there are in the UnionFind and returns the count.
 	public int numRoots() {
-		int count = 0;
-		for (int i = 0; i < nodes.length; i++) {
-			if (nodes[i] < 0) {
-				count++;
-			}
-		}
-		return count;
+		return numRoots;
 	}
 
 	// Returns true if the UnionFind is uniform, meaning that there is only one
