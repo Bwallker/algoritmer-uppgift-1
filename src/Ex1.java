@@ -127,6 +127,9 @@ final class MazeComponent extends JComponent {
 		// Set the color to our background color so we can remove walls by painting over
 		// them with the background color.
 		g.setColor(Color.yellow);
+		// UnionFind cannot be a class member because it needs to be reinitialized every
+		// time renderComponent is called in order for our component to be
+		// deterministic.
 		UnionFind uf = new UnionFind(cells * cells);
 		Random random = new Random();
 
