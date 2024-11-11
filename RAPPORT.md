@@ -9,7 +9,7 @@
 ### Bidrag
 
 #### Ben
-Jag skrev större delen av koden.
+Jag skrev en stor del av koden.
 
 
 #### Elias
